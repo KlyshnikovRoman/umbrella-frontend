@@ -3,5 +3,20 @@
   "version": "1.0.0",
   "description": "Umbrella Frontend",
   "author": "klyshnikov.roman@gmail.com",
-  "license": "ISC"
+  "license": "ISC",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "^12.1.5",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.25",
+    "@types/react": "^18.0.5",
+    "typescript": "^4.6.3"
+  }
 }
