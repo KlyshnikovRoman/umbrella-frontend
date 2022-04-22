@@ -1,0 +1,18 @@
+overwrite: true
+schema:
+  - src/graphql/type-defs.graphql
+  - ${NEXT_PUBLIC_GRAPHQL_ENDPOINT}
+documents: src/**/*.graphql
+generates:
+  src/graphql/schema.ts:
+    hooks:
+      afterOneFileWrite:
+        - prettier --write
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-react-apollo
+  schema.graphql:
+    plugins:
+      - schema-ast
+watch: true
