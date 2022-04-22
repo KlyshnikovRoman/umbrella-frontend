@@ -12,20 +12,33 @@
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "prettier": "prettier --write .",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "gen": "graphql-codegen --require dotenv/config"
   },
   "dependencies": {
+    "@apollo/client": "^3.5.10",
+    "deepmerge": "^4.2.2",
+    "graphql": "^16.3.0",
+    "lodash": "^4.17.21",
     "next": "^12.1.5",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "2.6.2",
+    "@graphql-codegen/schema-ast": "^2.4.1",
+    "@graphql-codegen/typescript": "^2.4.8",
+    "@graphql-codegen/typescript-operations": "^2.3.5",
+    "@graphql-codegen/typescript-react-apollo": "^3.2.11",
+    "@types/lodash": "^4.14.182",
     "@types/node": "^17.0.25",
     "@types/react": "^18.0.5",
     "@typescript-eslint/eslint-plugin": "^5.20.0",
+    "dotenv": "^16.0.0",
     "eslint": "^8.13.0",
     "eslint-config-next": "^12.1.5",
     "eslint-config-prettier": "^8.5.0",
+    "graphql-tag": "^2.12.6",
     "husky": "^7.0.4",
     "lint-staged": "^12.4.0",
     "prettier": "^2.6.2",
