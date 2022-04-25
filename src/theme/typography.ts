@@ -1,7 +1,7 @@
 import { ThemeOptions } from '@mui/material/styles'
 
 export const typography: ThemeOptions['typography'] = {
-  fontFamily: 'GT Walsheim Pro, Helvetica Neue, Helvetica, Arial, sans-serif',
+  fontFamily: ['GT Walsheim Pro', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'].join(','),
   fontWeightThin: 100,
   fontWeightLight: 300,
   fontWeightRegular: 400,
