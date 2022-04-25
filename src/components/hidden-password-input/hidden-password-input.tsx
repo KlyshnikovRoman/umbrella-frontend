@@ -5,7 +5,7 @@ import {
   VisibilityOff as VisibilityOffIcon,
 } from '@mui/icons-material'
 
-type HiddenPasswordInputProps = {
+export type HiddenPasswordInputProps = {
   isShow?: boolean
   onShow?(bool: boolean): void
 } & TextFieldProps
