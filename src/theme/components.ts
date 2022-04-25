@@ -1,4 +1,4 @@
-import { alpha, lighten, Theme } from '@mui/material/styles'
+import { alpha, lighten, Theme, outlinedInputClasses } from '@mui/material'
 import { scrollbar } from './scrollbar'
 
 export function components(theme: Theme): Theme['components'] {
@@ -83,6 +83,38 @@ export function components(theme: Theme): Theme['components'] {
       styleOverrides: {
         root: {
           backgroundColor: lighten(theme.palette.grey[500], 0.1),
+        },
+      },
+    },
+    MuiTextField: {
+      defaultProps: {
+        size: 'small',
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          backgroundColor: theme.palette.grey[600],
+          transition: theme.transitions.create('background-color', {
+            duration: theme.transitions.duration.shortest,
+          }),
+          [`&.${outlinedInputClasses.focused}`]: {
+            backgroundColor: theme.palette.grey[900],
+          },
+          [`&:hover:not(.${outlinedInputClasses.focused}) .${outlinedInputClasses.notchedOutline}`]:
+            {
+              borderColor: theme.palette.grey[200],
+            },
+        },
+        notchedOutline: {
+          transition: theme.transitions.create('border-color', {
+            duration: theme.transitions.duration.shortest,
+          }),
+        },
+        sizeSmall: {
+          '& svg': {
+            fontSize: theme.typography.pxToRem(20),
+          },
         },
       },
     },
