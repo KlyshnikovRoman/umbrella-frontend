@@ -1,4 +1,4 @@
-import { ThemeOptions, PaletteOptions } from '@mui/material/styles'
+import { ThemeOptions, PaletteOptions } from '@mui/material'
 
 const grey: PaletteOptions['grey'] = {
   50: '#f7f7fd',

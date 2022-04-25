@@ -1,4 +1,4 @@
-import { ThemeOptions } from '@mui/material/styles'
+import { ThemeOptions } from '@mui/material'
 
 export const typography: ThemeOptions['typography'] = {
   fontFamily: ['GT Walsheim Pro', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'].join(','),
