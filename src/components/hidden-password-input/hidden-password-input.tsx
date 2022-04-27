@@ -23,7 +23,7 @@ export const HiddenPasswordInput = React.forwardRef<any, HiddenPasswordInputProp
       } else {
         setIsShowSate(!isShow)
       }
-    }, [onShow, isShow])
+    }, [isControlled, onShow, isShow])
 
     const Icon = isShow ? VisibilityOffIcon : VisibilityIcon
 
