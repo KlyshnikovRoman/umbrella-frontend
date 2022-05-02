@@ -101,10 +101,6 @@ export function components(theme: Theme): Theme['components'] {
           [`&.${outlinedInputClasses.focused}`]: {
             backgroundColor: theme.palette.grey[900],
           },
-          [`&:hover:not(.${outlinedInputClasses.focused}) .${outlinedInputClasses.notchedOutline}`]:
-            {
-              borderColor: theme.palette.grey[200],
-            },
         },
         notchedOutline: {
           transition: theme.transitions.create('border-color', {
