@@ -4,9 +4,11 @@ import { Box, Link, Stack, Typography } from '@mui/material'
 import { LoadingButton } from '@mui/lab'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { LogoIcon } from 'src/components/icons'
+import { UsernameValidationInput } from 'src/features/login/components/username-validation-input'
 import { EmailValidationInput } from 'src/features/login/components/email-validation-input'
 
 interface FormValues {
+  email: string
   username: string
 }
 
@@ -14,6 +16,7 @@ function SignupForm() {
   const methods = useForm<FormValues>({
     mode: 'onTouched',
     defaultValues: {
+      email: '',
       username: '',
     },
   })
@@ -37,6 +40,12 @@ function SignupForm() {
             name='email'
             helperText='На этот адрес будет выслано письмо с ссылкой для завершении регистрации.'
             autoFocus
+            fullWidth
+          />
+          <UsernameValidationInput
+            id='signup-username'
+            name='username'
+            helperTextSuccess='Под этим именем вас будут знать другие пользователи. Его можно будет изменить в любо время.'
             fullWidth
           />
         </Stack>
