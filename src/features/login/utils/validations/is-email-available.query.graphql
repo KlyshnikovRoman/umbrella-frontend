@@ -1,0 +1,3 @@
+query IsEmailAvailable($email: String!) {
+  isEmailAvailable(email: $email)
+}
