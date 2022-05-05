@@ -1,127 +1,113 @@
 import React from 'react'
-import { CircularProgress, InputAdornment, TextField, TextFieldProps } from '@mui/material'
-import { useController, UseControllerProps } from 'react-hook-form'
+import { TextFieldProps } from '@mui/material'
+import { useFormContext } from 'react-hook-form'
+import { PendingIndicatorInput } from 'src/components/pending-indicator-input'
 import {
   ALLOWED_CHARACTERS_USERNAME_REGEX,
   isUsernameAvailable,
   LOW_LINES_USERNAME_REGEX,
   RANGE_LENGTH_USERNAME_REGEX,
+  errorMessages,
 } from 'src/features/login/utils/validations/username-validation'
-import { FormValues } from 'src/pages/login/signup'
 
-export type UsernameValidationInputProps = Pick<
-  UseControllerProps<FormValues>,
-  'control' | 'name'
-> &
-  TextFieldProps
+export type UsernameValidationInputProps = {
+  helperTextSuccess?: React.ReactNode
+} & TextFieldProps
 
-export function UsernameValidationInput({
-  control,
-  name: nameProp,
-  ...rest
-}: UsernameValidationInputProps) {
-  const [isPending, setIsPending] = React.useState(false)
-  const timerRef = React.useRef<NodeJS.Timeout>()
-  const {
-    field: { ref, value, onChange, onBlur, name },
-    fieldState: { error, isDirty },
-  } = useController({
-    control,
-    name: nameProp,
-    defaultValue: '',
-    rules: {
-      validate: {
-        rangeLength(value) {
-          const isMatch = RANGE_LENGTH_USERNAME_REGEX.test(value)
+export const UsernameValidationInput = React.forwardRef<any, UsernameValidationInputProps>(
+  function UsernameInputValidation(props, ref) {
+    const {
+      name: nameProp,
+      helperText = errorMessages.allowedCharacters,
+      helperTextSuccess,
+      ...rest
+    } = props
+    const { register, getValues, formState, getFieldState } = useFormContext()
+    const [isPending, setIsPending] = React.useState<boolean>(false)
+    const timerRef = React.useRef<NodeJS.Timeout>()
+    const prevValue = React.useRef(getValues(nameProp))
+    const {
+      ref: inputRef,
+      name,
+      onChange,
+      onBlur,
+    } = register(nameProp, {
+      async validate(value) {
+        // При изменении поля сбрасывать таймер, если он до этого был установлен, но так и не успел
+        // сработать, потому что было изменено значение раньше, чел сработал таймер и был выполнен
+        // запрос.
+        if (timerRef.current) {
+          clearTimeout(timerRef.current)
+          timerRef.current = null
+        }
 
-          if (!isMatch) {
-            stopValidateAvailableUsername()
-          }
+        let error: string
 
-          return isMatch || 'Имя пользователя должно содержать от 3 до 20 символов.'
-        },
-        allowedCharacters: (value) => {
-          const isMatch = ALLOWED_CHARACTERS_USERNAME_REGEX.test(value)
-
-          if (!isMatch) {
-            stopValidateAvailableUsername()
-          }
-
-          return (
-            isMatch ||
-            'Имя пользователя может использовать буквы латинского алфавита, цифры и нижние подчёркивания.'
-          )
-        },
-        lowLines(value) {
-          const isMatch = LOW_LINES_USERNAME_REGEX.test(value)
-
-          if (!isMatch) {
-            stopValidateAvailableUsername()
-          }
-
-          return (
-            isMatch ||
-            'Имя пользователя не может содержать идущий подряд знак нижнего подчёркивания, начинаться и заканчиваться им.'
-          )
-        },
-        async availableFetch(value) {
-          setIsPending(true)
-
-          if (timerRef.current) {
-            clearTimeout(timerRef.current)
-            timerRef.current = null
-          }
-
+        if (!RANGE_LENGTH_USERNAME_REGEX.test(value)) {
+          error = errorMessages.rangeLength
+        } else if (!ALLOWED_CHARACTERS_USERNAME_REGEX.test(value)) {
+          error = errorMessages.allowedCharacters
+        } else if (!LOW_LINES_USERNAME_REGEX.test(value)) {
+          error = errorMessages.lowLines
+        }
+        // Это условие для того, чтобы при повторных проверок onBlur и onSubmit не делать лишних
+        // отправок запросов.
+        else if (prevValue.current !== value) {
           const isAvailable = await new Promise<boolean>((resolve) => {
+            setIsPending(true)
+
             timerRef.current = setTimeout(() => {
               resolve(isUsernameAvailable(value))
+
+              timerRef.current = null
+
+              setIsPending(false)
             }, 500)
           })
 
+          if (!isAvailable) {
+            error = errorMessages.unavailable
+          }
+
+          // Предыдущее значение нас интересует только для этого блока, поэтому установка его должна
+          // быть здесь с момента последнего запроса.
+          prevValue.current = value
+        }
+
+        // Если же isPending true, то устанавливаем false.
+        // Это нужно, если предыдущее значение проверялось с отправкой запроса, но таймаут был
+        // сброшен сверху, и не дошёл до проверки с запросом, вследствие чего isPending по-прежнему
+        // активен.
+        if (isPending) {
           setIsPending(false)
+        }
 
-          return isAvailable || 'Это имя пользователя недоступно.'
-        },
+        return error
       },
-    },
-  })
+    })
+    const { error, isDirty } = getFieldState(name, formState)
+    const inputHelperText = error
+      ? error.message
+      : isDirty && !error
+      ? helperTextSuccess
+      : helperText
 
-  const stopValidateAvailableUsername = () => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current)
-      timerRef.current = null
-    }
-    if (isPending) {
-      setIsPending(false)
-    }
+    return (
+      <PendingIndicatorInput
+        aria-label='Создание имени пользователя'
+        ref={ref}
+        isPending={isPending}
+        inputRef={inputRef}
+        name={name}
+        onChange={onChange}
+        onBlur={onBlur}
+        error={!!error}
+        helperText={inputHelperText}
+        label='Имя пользователя'
+        autoComplete='off'
+        spellCheck={false}
+        {...rest}
+      />
+    )
   }
-
-  return (
-    <TextField
-      inputRef={ref}
-      value={value}
-      onChange={onChange}
-      onBlur={onBlur}
-      name={name}
-      label='Имя пользователя'
-      error={!!error}
-      InputProps={{
-        endAdornment: isPending && (
-          <InputAdornment position='end'>
-            <CircularProgress size='1em' color='inherit' />
-          </InputAdornment>
-        ),
-      }}
-      helperText={
-        isPending
-          ? 'Проверка имени пользователя.'
-          : error
-          ? error.message
-          : !isDirty &&
-            'Имя пользователя может использовать буквы латинского алфавита, цифры и знак нижнего подчёркивания.'
-      }
-      autoComplete='off'
-      {...rest}
-    />
-  )
-}
+)

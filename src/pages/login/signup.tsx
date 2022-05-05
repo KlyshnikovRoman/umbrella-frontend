@@ -1,37 +1,56 @@
-/* eslint-disable no-console */
 import React from 'react'
 import NextLink from 'next/link'
 import { Box, Link, Stack, Typography } from '@mui/material'
 import { LoadingButton } from '@mui/lab'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { LogoIcon } from 'src/components/icons'
-import { UsernameValidationInput } from 'src/features/login/components/username-validation-input'
+import { EmailValidationInput } from 'src/features/login/components/email-validation-input'
 
-export interface FormValues {
+interface FormValues {
   username: string
 }
 
 function SignupForm() {
-  const { control, handleSubmit } = useForm<FormValues>({
+  const methods = useForm<FormValues>({
     mode: 'onTouched',
     defaultValues: {
       username: '',
     },
   })
 
+  const {
+    handleSubmit,
+    formState: { isSubmitting },
+  } = methods
+
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
+    // eslint-disable-next-line no-console
     console.log(data)
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Stack spacing={3}>
-        <UsernameValidationInput control={control} name='username' />
-      </Stack>
-      <LoadingButton sx={{ mt: 3 }} type='submit' variant='contained' fullWidth>
-        Зарегистрироваться
-      </LoadingButton>
-    </form>
+    <FormProvider {...methods}>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Stack spacing={3}>
+          <EmailValidationInput
+            id='signup-email'
+            name='email'
+            helperText='На этот адрес будет выслано письмо с ссылкой для завершении регистрации.'
+            autoFocus
+            fullWidth
+          />
+        </Stack>
+        <LoadingButton
+          sx={{ mt: 3 }}
+          type='submit'
+          variant='contained'
+          loading={isSubmitting}
+          fullWidth
+        >
+          Зарегистрироваться
+        </LoadingButton>
+      </form>
+    </FormProvider>
   )
 }
 
@@ -52,7 +71,7 @@ export default function Signup() {
             px: 2,
             py: 4,
             '@media (min-width: 450px)': {
-              px: 4,
+              px: 3,
             },
             width: { sm: 440 },
             bgcolor: 'background.paper',

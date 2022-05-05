@@ -22,3 +22,12 @@ export async function isUsernameAvailable(username: string) {
     return false
   }
 }
+
+export const errorMessages = {
+  rangeLength: 'Имя пользователя должно содержать от 3 до 20 символов.',
+  allowedCharacters:
+    'Имя пользователя может использовать буквы латинского алфавита, цифры и нижние подчёркивания.',
+  lowLines:
+    'Имя пользователя не может содержать идущий подряд знак нижнего подчёркивания, начинаться и заканчиваться им.',
+  unavailable: 'Это имя пользователя недоступно.',
+}
