@@ -9,6 +9,7 @@ import {
   RANGE_LENGTH_USERNAME_REGEX,
   errorMessages,
 } from 'src/features/login/utils/validations/username-validation'
+import { rhfTransformRegister } from 'src/utils/rhf-transform-register'
 
 export type UsernameValidationInputProps = {
   helperTextSuccess?: React.ReactNode
@@ -17,74 +18,58 @@ export type UsernameValidationInputProps = {
 export const UsernameValidationInput = React.forwardRef<any, UsernameValidationInputProps>(
   function UsernameInputValidation(props, ref) {
     const {
-      name: nameProp,
+      name,
       helperText = errorMessages.allowedCharacters,
       helperTextSuccess,
+      inputProps,
       ...rest
     } = props
-    const { register, getValues, formState, getFieldState } = useFormContext()
+    const { register, formState, getFieldState } = useFormContext()
     const [isPending, setIsPending] = React.useState<boolean>(false)
     const timerRef = React.useRef<NodeJS.Timeout>()
-    const prevValue = React.useRef(getValues(nameProp))
-    const {
-      ref: inputRef,
-      name,
-      onChange,
-      onBlur,
-    } = register(nameProp, {
-      async validate(value) {
-        // При изменении поля сбрасывать таймер, если он до этого был установлен, но так и не успел
-        // сработать, потому что было изменено значение раньше, чел сработал таймер и был выполнен
-        // запрос.
-        if (timerRef.current) {
-          clearTimeout(timerRef.current)
-          timerRef.current = null
-        }
 
-        let error: string
-
-        if (!RANGE_LENGTH_USERNAME_REGEX.test(value)) {
-          error = errorMessages.rangeLength
-        } else if (!ALLOWED_CHARACTERS_USERNAME_REGEX.test(value)) {
-          error = errorMessages.allowedCharacters
-        } else if (!LOW_LINES_USERNAME_REGEX.test(value)) {
-          error = errorMessages.lowLines
-        }
-        // Это условие для того, чтобы при повторных проверок onBlur и onSubmit не делать лишних
-        // отправок запросов.
-        else if (prevValue.current !== value) {
-          const isAvailable = await new Promise<boolean>((resolve) => {
-            setIsPending(true)
-
-            timerRef.current = setTimeout(() => {
-              resolve(isUsernameAvailable(value))
-
-              timerRef.current = null
-
-              setIsPending(false)
-            }, 500)
-          })
-
-          if (!isAvailable) {
-            error = errorMessages.unavailable
+    const registerProps = rhfTransformRegister(
+      register(name, {
+        async validate(value) {
+          if (timerRef.current) {
+            clearTimeout(timerRef.current)
+            timerRef.current = null
           }
 
-          // Предыдущее значение нас интересует только для этого блока, поэтому установка его должна
-          // быть здесь с момента последнего запроса.
-          prevValue.current = value
-        }
+          let errorMessage: string
 
-        // Если же isPending true, то устанавливаем false.
-        // Это нужно, если предыдущее значение проверялось с отправкой запроса, но таймаут был
-        // сброшен сверху, и не дошёл до проверки с запросом, вследствие чего isPending по-прежнему
-        // активен.
-        if (isPending) {
-          setIsPending(false)
-        }
+          if (!RANGE_LENGTH_USERNAME_REGEX.test(value)) {
+            errorMessage = errorMessages.rangeLength
+          } else if (!ALLOWED_CHARACTERS_USERNAME_REGEX.test(value)) {
+            errorMessage = errorMessages.allowedCharacters
+          } else if (!LOW_LINES_USERNAME_REGEX.test(value)) {
+            errorMessage = errorMessages.lowLines
+          } else {
+            const isAvailable = await new Promise<boolean>((resolve) => {
+              setIsPending(true)
 
-        return error
-      },
-    })
+              timerRef.current = setTimeout(() => {
+                resolve(isUsernameAvailable(value))
+
+                timerRef.current = null
+
+                setIsPending(false)
+              }, 500)
+            })
+
+            if (!isAvailable) {
+              errorMessage = errorMessages.unavailable
+            }
+          }
+
+          if (isPending) {
+            setIsPending(false)
+          }
+
+          return errorMessage
+        },
+      })
+    )
     const { error, isDirty } = getFieldState(name, formState)
     const inputHelperText = error
       ? error.message
@@ -94,19 +79,19 @@ export const UsernameValidationInput = React.forwardRef<any, UsernameValidationI
 
     return (
       <PendingIndicatorInput
-        aria-label='Создание имени пользователя'
         ref={ref}
         isPending={isPending}
-        inputRef={inputRef}
-        name={name}
-        onChange={onChange}
-        onBlur={onBlur}
         error={!!error}
         helperText={inputHelperText}
         label='Имя пользователя'
         autoComplete='off'
-        spellCheck={false}
+        inputProps={{
+          'aria-label': 'Создайте имя пользователя',
+          spellCheck: false,
+          ...inputProps,
+        }}
         {...rest}
+        {...registerProps}
       />
     )
   }
