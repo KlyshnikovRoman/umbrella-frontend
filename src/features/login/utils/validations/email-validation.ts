@@ -22,7 +22,7 @@ export async function isEmailAvailable(email: string) {
   }
 }
 
-export const errorMessages = {
+export const messages = {
   invalid: 'Адрес электронной почты введён некорректно.',
   unavailable: 'Это адрес электронной почты уже используется.',
 }

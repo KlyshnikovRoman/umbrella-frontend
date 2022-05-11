@@ -5,7 +5,7 @@ import { PendingIndicatorInput } from 'src/components/pending-indicator-input'
 import {
   EMAIL_REGEX,
   isEmailAvailable,
-  errorMessages,
+  messages,
 } from 'src/features/login/utils/validations/email-validation'
 import { rhfTransformRegister } from 'src/utils/rhf-transform-register'
 
@@ -13,13 +13,14 @@ export type EmailValidationInputProps = TextFieldProps
 
 export const EmailValidationInput = React.forwardRef<any, EmailValidationInputProps>(
   function EmailValidationInput(props, ref) {
-    const { name, helperText, inputProps, ...rest } = props
+    const { name, helperText, inputProps, disabled = false, ...rest } = props
     const { register, formState, getFieldState } = useFormContext()
     const [isPending, setIsPending] = React.useState<boolean>(false)
     const timerRef = React.useRef<NodeJS.Timeout>()
 
     const registerProps = rhfTransformRegister(
       register(name, {
+        disabled,
         async validate(value) {
           if (timerRef.current) {
             clearTimeout(timerRef.current)
@@ -29,7 +30,7 @@ export const EmailValidationInput = React.forwardRef<any, EmailValidationInputPr
           let error: string
 
           if (!EMAIL_REGEX.test(value)) {
-            error = errorMessages.invalid
+            error = messages.invalid
           } else {
             const isAvailable = await new Promise<boolean>((resolve) => {
               setIsPending(true)
@@ -44,7 +45,7 @@ export const EmailValidationInput = React.forwardRef<any, EmailValidationInputPr
             })
 
             if (!isAvailable) {
-              error = errorMessages.unavailable
+              error = messages.unavailable
             }
           }
 
@@ -62,7 +63,7 @@ export const EmailValidationInput = React.forwardRef<any, EmailValidationInputPr
       <PendingIndicatorInput
         ref={ref}
         isPending={isPending}
-        error={!!error}
+        error={Boolean(error)}
         helperText={error?.message || helperText}
         label='Адрес электронной почты'
         inputProps={{

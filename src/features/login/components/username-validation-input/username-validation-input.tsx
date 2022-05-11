@@ -7,7 +7,7 @@ import {
   isUsernameAvailable,
   LOW_LINES_USERNAME_REGEX,
   RANGE_LENGTH_USERNAME_REGEX,
-  errorMessages,
+  messages,
 } from 'src/features/login/utils/validations/username-validation'
 import { rhfTransformRegister } from 'src/utils/rhf-transform-register'
 
@@ -16,12 +16,13 @@ export type UsernameValidationInputProps = {
 } & TextFieldProps
 
 export const UsernameValidationInput = React.forwardRef<any, UsernameValidationInputProps>(
-  function UsernameInputValidation(props, ref) {
+  function UsernameValidationInput(props, ref) {
     const {
       name,
-      helperText = errorMessages.allowedCharacters,
+      helperText = messages.allowedCharacters,
       helperTextSuccess,
       inputProps,
+      disabled = false,
       ...rest
     } = props
     const { register, formState, getFieldState } = useFormContext()
@@ -30,6 +31,7 @@ export const UsernameValidationInput = React.forwardRef<any, UsernameValidationI
 
     const registerProps = rhfTransformRegister(
       register(name, {
+        disabled,
         async validate(value) {
           if (timerRef.current) {
             clearTimeout(timerRef.current)
@@ -39,11 +41,11 @@ export const UsernameValidationInput = React.forwardRef<any, UsernameValidationI
           let errorMessage: string
 
           if (!RANGE_LENGTH_USERNAME_REGEX.test(value)) {
-            errorMessage = errorMessages.rangeLength
+            errorMessage = messages.rangeLength
           } else if (!ALLOWED_CHARACTERS_USERNAME_REGEX.test(value)) {
-            errorMessage = errorMessages.allowedCharacters
+            errorMessage = messages.allowedCharacters
           } else if (!LOW_LINES_USERNAME_REGEX.test(value)) {
-            errorMessage = errorMessages.lowLines
+            errorMessage = messages.lowLines
           } else {
             const isAvailable = await new Promise<boolean>((resolve) => {
               setIsPending(true)
@@ -58,7 +60,7 @@ export const UsernameValidationInput = React.forwardRef<any, UsernameValidationI
             })
 
             if (!isAvailable) {
-              errorMessage = errorMessages.unavailable
+              errorMessage = messages.unavailable
             }
           }
 
@@ -81,7 +83,7 @@ export const UsernameValidationInput = React.forwardRef<any, UsernameValidationI
       <PendingIndicatorInput
         ref={ref}
         isPending={isPending}
-        error={!!error}
+        error={Boolean(error)}
         helperText={inputHelperText}
         label='Имя пользователя'
         autoComplete='off'
