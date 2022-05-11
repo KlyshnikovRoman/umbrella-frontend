@@ -10,7 +10,7 @@ export function CapsLockIndicator({ onCapsLockChange, children }: CapsLockIndica
 
   const onKeyPress = React.useCallback(
     (event: KeyboardEvent) => {
-      const capsLockState = event?.getModifierState('CapsLock')
+      const capsLockState = event.getModifierState?.('CapsLock')
 
       if (isCapsLock !== capsLockState) {
         setIsCapsLock(capsLockState)
