@@ -6,18 +6,23 @@ import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { LogoIcon } from 'src/components/icons'
 import { UsernameValidationInput } from 'src/features/login/components/username-validation-input'
 import { EmailValidationInput } from 'src/features/login/components/email-validation-input'
+import { PasswordValidationInputs } from 'src/features/login/components/password-validation-inputs'
 
 interface FormValues {
   email: string
   username: string
+  password: string
+  repassword: string
 }
 
 function SignupForm() {
   const methods = useForm<FormValues>({
-    mode: 'onTouched',
+    mode: 'onChange',
     defaultValues: {
       email: '',
       username: '',
+      password: '',
+      repassword: '',
     },
   })
 
@@ -47,6 +52,18 @@ function SignupForm() {
             name='username'
             helperTextSuccess='Под этим именем вас будут знать другие пользователи. Его можно будет изменить в любо время.'
             fullWidth
+          />
+          <PasswordValidationInputs
+            passwordName='password'
+            repasswordName='repassword'
+            passwordInputProps={{
+              id: 'signup-password',
+              fullWidth: true,
+            }}
+            repasswordInputProps={{
+              id: 'signup-repassword',
+              fullWidth: true,
+            }}
           />
         </Stack>
         <LoadingButton
