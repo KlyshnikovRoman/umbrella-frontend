@@ -21,7 +21,7 @@ const nextConfig = {
     config.module.rules.push({
       test: /\.graphql$/,
       exclude: /node_modules/,
-      loader: 'graphql-tag/loader'
+      loader: 'graphql-tag/loader',
     })
 
     return config
