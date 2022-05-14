@@ -22,7 +22,7 @@ export function EndAdornment({ isShown, onIconButtonClick }: EndAdornmentProps) 
 
   return (
     <>
-      <InputAdornment onMouseDown={prevent} position='end'>
+      <InputAdornment onMouseDown={prevent} onMouseUp={prevent} position='end'>
         <CapsLockIndicator>
           {(isCapsLock) => (
             <KeyboardCapslockIcon
@@ -38,6 +38,7 @@ export function EndAdornment({ isShown, onIconButtonClick }: EndAdornmentProps) 
         aria-label='Показать/скрыть пароль'
         onClick={onIconButtonClick}
         onMouseDown={prevent}
+        onMouseUp={prevent}
         edge='end'
         disabled={disabled}
       >
