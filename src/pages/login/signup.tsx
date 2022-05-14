@@ -1,84 +1,8 @@
 import React from 'react'
 import NextLink from 'next/link'
-import { Box, Link, Stack, Typography } from '@mui/material'
-import { LoadingButton } from '@mui/lab'
-import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
+import { Box, Link, Typography } from '@mui/material'
 import { LogoIcon } from 'src/components/icons'
-import { UsernameValidationInput } from 'src/features/login/components/username-validation-input'
-import { EmailValidationInput } from 'src/features/login/components/email-validation-input'
-import { PasswordValidationInputs } from 'src/features/login/components/password-validation-inputs'
-
-interface FormValues {
-  email: string
-  username: string
-  password: string
-  repassword: string
-}
-
-function SignupForm() {
-  const methods = useForm<FormValues>({
-    mode: 'onChange',
-    defaultValues: {
-      email: '',
-      username: '',
-      password: '',
-      repassword: '',
-    },
-  })
-
-  const {
-    handleSubmit,
-    formState: { isSubmitting },
-  } = methods
-
-  const onSubmit: SubmitHandler<FormValues> = async (data) => {
-    // eslint-disable-next-line no-console
-    console.log(data)
-  }
-
-  return (
-    <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Stack spacing={3}>
-          <EmailValidationInput
-            id='signup-email'
-            name='email'
-            helperText='На этот адрес будет выслано письмо с ссылкой для завершении регистрации.'
-            autoFocus
-            fullWidth
-          />
-          <UsernameValidationInput
-            id='signup-username'
-            name='username'
-            helperTextSuccess='Под этим именем вас будут знать другие пользователи. Его можно будет изменить в любо время.'
-            fullWidth
-          />
-          <PasswordValidationInputs
-            passwordName='password'
-            repasswordName='repassword'
-            passwordInputProps={{
-              id: 'signup-password',
-              fullWidth: true,
-            }}
-            repasswordInputProps={{
-              id: 'signup-repassword',
-              fullWidth: true,
-            }}
-          />
-        </Stack>
-        <LoadingButton
-          sx={{ mt: 3 }}
-          type='submit'
-          variant='contained'
-          loading={isSubmitting}
-          fullWidth
-        >
-          Зарегистрироваться
-        </LoadingButton>
-      </form>
-    </FormProvider>
-  )
-}
+import { SignupForm } from 'src/features/login/components/signup-form'
 
 export default function Signup() {
   return (

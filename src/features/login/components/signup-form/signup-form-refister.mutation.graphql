@@ -1,0 +1,8 @@
+mutation SignupFormRegister($input: UsersPermissionsRegisterInput!) {
+  register(input: $input) {
+    user {
+      id
+      username
+    }
+  }
+}

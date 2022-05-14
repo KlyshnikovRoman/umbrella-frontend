@@ -788,6 +788,18 @@ export type UsersPermissionsUserRelationResponseCollection = {
   data: Array<UsersPermissionsUserEntity>
 }
 
+export type SignupFormRegisterMutationVariables = Exact<{
+  input: UsersPermissionsRegisterInput
+}>
+
+export type SignupFormRegisterMutation = {
+  __typename?: 'Mutation'
+  register: {
+    __typename?: 'UsersPermissionsLoginPayload'
+    user: { __typename?: 'UsersPermissionsMe'; id: string; username: string }
+  }
+}
+
 export type IsEmailAvailableQueryVariables = Exact<{
   email: Scalars['String']
 }>
@@ -800,6 +812,56 @@ export type IsUsernameAvailableQueryVariables = Exact<{
 
 export type IsUsernameAvailableQuery = { __typename?: 'Query'; isUsernameAvailable: boolean }
 
+export const SignupFormRegisterDocument = gql`
+  mutation SignupFormRegister($input: UsersPermissionsRegisterInput!) {
+    register(input: $input) {
+      user {
+        id
+        username
+      }
+    }
+  }
+`
+export type SignupFormRegisterMutationFn = Apollo.MutationFunction<
+  SignupFormRegisterMutation,
+  SignupFormRegisterMutationVariables
+>
+
+/**
+ * __useSignupFormRegisterMutation__
+ *
+ * To run a mutation, you first call `useSignupFormRegisterMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSignupFormRegisterMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [signupFormRegisterMutation, { data, loading, error }] = useSignupFormRegisterMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useSignupFormRegisterMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    SignupFormRegisterMutation,
+    SignupFormRegisterMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useMutation<SignupFormRegisterMutation, SignupFormRegisterMutationVariables>(
+    SignupFormRegisterDocument,
+    options
+  )
+}
+export type SignupFormRegisterMutationHookResult = ReturnType<typeof useSignupFormRegisterMutation>
+export type SignupFormRegisterMutationResult = Apollo.MutationResult<SignupFormRegisterMutation>
+export type SignupFormRegisterMutationOptions = Apollo.BaseMutationOptions<
+  SignupFormRegisterMutation,
+  SignupFormRegisterMutationVariables
+>
 export const IsEmailAvailableDocument = gql`
   query IsEmailAvailable($email: String!) {
     isEmailAvailable(email: $email)
