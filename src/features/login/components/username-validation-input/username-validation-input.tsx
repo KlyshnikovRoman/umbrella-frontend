@@ -1,6 +1,6 @@
 import React from 'react'
 import { TextFieldProps } from '@mui/material'
-import { useFormContext } from 'react-hook-form'
+import { Controller } from 'react-hook-form'
 import { PendingIndicatorInput } from 'src/components/pending-indicator-input'
 import {
   ALLOWED_CHARACTERS_USERNAME_REGEX,
@@ -9,7 +9,6 @@ import {
   RANGE_LENGTH_USERNAME_REGEX,
   messages,
 } from 'src/features/login/utils/validations/username-validation'
-import { rhfTransformRegister } from 'src/utils/rhf-transform-register'
 
 export type UsernameValidationInputProps = {
   helperTextSuccess?: React.ReactNode
@@ -19,81 +18,83 @@ export const UsernameValidationInput = React.forwardRef<any, UsernameValidationI
   function UsernameValidationInput(props, ref) {
     const {
       name,
-      helperText = messages.allowedCharacters,
-      helperTextSuccess,
       inputProps,
-      disabled = false,
+      helperTextSuccess = messages.success,
+      helperText: helperTextProp = messages.allowedCharacters,
       ...rest
     } = props
-    const { register, formState, getFieldState } = useFormContext()
     const [isPending, setIsPending] = React.useState<boolean>(false)
     const timerRef = React.useRef<NodeJS.Timeout>()
 
-    const registerProps = rhfTransformRegister(
-      register(name, {
-        disabled,
-        async validate(value) {
-          if (timerRef.current) {
-            clearTimeout(timerRef.current)
-            timerRef.current = null
-          }
+    return (
+      <Controller
+        name={name}
+        rules={{
+          async validate(value) {
+            if (timerRef.current) {
+              clearTimeout(timerRef.current)
+              timerRef.current = null
+            }
 
-          let errorMessage: string
+            let errorMessage: string
 
-          if (!RANGE_LENGTH_USERNAME_REGEX.test(value)) {
-            errorMessage = messages.rangeLength
-          } else if (!ALLOWED_CHARACTERS_USERNAME_REGEX.test(value)) {
-            errorMessage = messages.allowedCharacters
-          } else if (!LOW_LINES_USERNAME_REGEX.test(value)) {
-            errorMessage = messages.lowLines
-          } else {
-            const isAvailable = await new Promise<boolean>((resolve) => {
+            if (!RANGE_LENGTH_USERNAME_REGEX.test(value)) {
+              errorMessage = messages.rangeLength
+            } else if (!ALLOWED_CHARACTERS_USERNAME_REGEX.test(value)) {
+              errorMessage = messages.allowedCharacters
+            } else if (!LOW_LINES_USERNAME_REGEX.test(value)) {
+              errorMessage = messages.lowLines
+            } else {
               setIsPending(true)
 
-              timerRef.current = setTimeout(() => {
-                resolve(isUsernameAvailable(value))
+              const isAvailable = await new Promise<boolean>((resolve) => {
+                timerRef.current = setTimeout(() => {
+                  resolve(isUsernameAvailable(value))
 
-                timerRef.current = null
+                  timerRef.current = null
+                }, 500)
+              })
 
-                setIsPending(false)
-              }, 500)
-            })
+              if (!isAvailable) {
+                errorMessage = messages.unavailable
+              }
 
-            if (!isAvailable) {
-              errorMessage = messages.unavailable
+              setIsPending(false)
             }
-          }
 
-          if (isPending) {
-            setIsPending(false)
-          }
+            if (isPending) {
+              setIsPending(false)
+            }
 
-          return errorMessage
-        },
-      })
-    )
-    const { error, isDirty } = getFieldState(name, formState)
-    const inputHelperText = error
-      ? error.message
-      : isDirty && !error
-      ? helperTextSuccess
-      : helperText
-
-    return (
-      <PendingIndicatorInput
-        ref={ref}
-        isPending={isPending}
-        error={Boolean(error)}
-        helperText={inputHelperText}
-        label='Имя пользователя'
-        autoComplete='off'
-        inputProps={{
-          'aria-label': 'Создайте имя пользователя',
-          spellCheck: false,
-          ...inputProps,
+            return errorMessage
+          },
         }}
-        {...rest}
-        {...registerProps}
+        render={({ field: { ref: inputRef, ...restField }, fieldState: { error, isDirty } }) => {
+          const helperText = error
+            ? error.message
+            : isDirty && !error
+            ? helperTextSuccess
+            : helperTextProp
+
+          return (
+            <PendingIndicatorInput
+              isPending={isPending}
+              ref={ref}
+              inputRef={inputRef}
+              error={Boolean(error)}
+              helperText={helperText}
+              label='Имя пользователя'
+              autoComplete='off'
+              inputProps={{
+                'aria-label': 'Создайте имя пользователя',
+                spellCheck: false,
+                ...inputProps,
+              }}
+              {...rest}
+              {...restField}
+            />
+          )
+        }}
       />
     )
   }

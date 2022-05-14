@@ -1,95 +1,95 @@
 import React from 'react'
 import { TextFieldProps } from '@mui/material'
-import { useFormContext } from 'react-hook-form'
+import { useFormContext, Controller } from 'react-hook-form'
 import { PasswordInput } from 'src/components/password-input'
-import { rhfTransformRegister } from 'src/utils/rhf-transform-register'
 import {
   RANGE_LENGTH_PASSWORD_REGEX,
   messages,
 } from 'src/features/login/utils/validations/password-validation'
 
 export interface PasswordValidationInputsProps {
-  passwordName: string
-  repasswordName: string
-  passwordInputProps?: TextFieldProps
-  repasswordInputProps?: TextFieldProps
-  disabled?: boolean
+  passwordProps: TextFieldProps
+  repasswordProps: TextFieldProps
 }
 
 export function PasswordValidationInputs({
-  passwordName,
-  repasswordName,
-  passwordInputProps,
-  repasswordInputProps,
-  disabled = false,
+  passwordProps: { name: passwordName, inputProps: passwordInputProps, ...restPassword },
+  repasswordProps: { name: repasswordName, inputProps: repasswordInputProps, ...restRepassword },
 }: PasswordValidationInputsProps) {
-  const { register, getValues, getFieldState, trigger, formState } = useFormContext()
-  const passwordState = getFieldState(passwordName, formState)
-  const repasswordState = getFieldState(repasswordName, formState)
-
-  const passwordRegisterProps = rhfTransformRegister(
-    register(passwordName, {
-      disabled,
-      validate(value) {
-        if (repasswordState.isDirty) {
-          const isPasswordsMatch = value === getValues(repasswordName)
-
-          if (
-            (repasswordState.error && isPasswordsMatch) ||
-            (!repasswordState.error && !isPasswordsMatch)
-          ) {
-            trigger(repasswordName)
-          }
-        }
-
-        return RANGE_LENGTH_PASSWORD_REGEX.test(value) || messages.rangeLength
-      },
-    })
-  )
-  const repasswordRegisterProps = rhfTransformRegister(
-    register(repasswordName, {
-      disabled,
-      validate(value) {
-        let errorMessage: string
-
-        if (!value) {
-          errorMessage = messages.required
-        } else if (value !== getValues(passwordName)) {
-          errorMessage = messages.notMatch
-        }
-
-        return errorMessage
-      },
-    })
-  )
+  const {
+    getValues,
+    trigger,
+    formState: { dirtyFields, errors },
+  } = useFormContext()
 
   return (
     <>
-      <PasswordInput
-        label='Пароль'
-        error={Boolean(passwordState.error)}
-        helperText={passwordState.error?.message || messages.rangeLength}
-        autoComplete='off'
-        {...passwordInputProps}
-        inputProps={{
-          'aria-label': 'Создайте надёжный пароль',
-          spellCheck: false,
-          ...passwordInputProps.inputProps,
+      <Controller
+        name={passwordName}
+        rules={{
+          validate(value) {
+            if (dirtyFields[repasswordName]) {
+              const isPasswordsMatch = value === getValues(repasswordName)
+
+              if (
+                (errors[repasswordName] && isPasswordsMatch) ||
+                (!errors[repasswordName] && !isPasswordsMatch)
+              ) {
+                trigger(repasswordName)
+              }
+            }
+
+            return RANGE_LENGTH_PASSWORD_REGEX.test(value) || messages.rangeLength
+          },
         }}
-        {...passwordRegisterProps}
+        render={({ field: { ref, ...rest }, fieldState: { error, isDirty } }) => (
+          <PasswordInput
+            inputRef={ref}
+            label='Пароль'
+            error={Boolean(error)}
+            helperText={error?.message || (!error && !isDirty && messages.rangeLength)}
+            autoComplete='off'
+            {...restPassword}
+            inputProps={{
+              'aria-label': 'Создайте надёжный пароль',
+              spellCheck: false,
+              ...passwordInputProps,
+            }}
+            {...rest}
+          />
+        )}
       />
-      <PasswordInput
-        label='Повтор пароля'
-        error={Boolean(repasswordState.error)}
-        helperText={repasswordState.error?.message || messages.repeat}
-        autoComplete='off'
-        {...repasswordInputProps}
-        inputProps={{
-          'aria-label': 'Повторите созданный пароль',
-          spellCheck: false,
-          ...repasswordInputProps.inputProps,
+      <Controller
+        name={repasswordName}
+        rules={{
+          validate(value) {
+            let errorMessage: string
+
+            if (!value) {
+              errorMessage = messages.required
+            } else if (value !== getValues(passwordName)) {
+              errorMessage = messages.notMatch
+            }
+
+            return errorMessage
+          },
         }}
-        {...repasswordRegisterProps}
+        render={({ field: { ref, ...rest }, fieldState: { error, isDirty } }) => (
+          <PasswordInput
+            inputRef={ref}
+            label='Повтор пароля'
+            error={Boolean(error)}
+            helperText={error?.message || (!error && !isDirty && messages.repeat)}
+            autoComplete='off'
+            {...restRepassword}
+            inputProps={{
+              'aria-label': 'Повторите созданный пароль',
+              spellCheck: false,
+              ...repasswordInputProps,
+            }}
+            {...rest}
+          />
+        )}
       />
     </>
   )
