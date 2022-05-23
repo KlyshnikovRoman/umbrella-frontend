@@ -58,6 +58,7 @@ export const EmailValidationInput = React.forwardRef<any, EmailValidationInputPr
         render={({ field: { ref: inputRef, ...restField }, fieldState: { error } }) => (
           <PendingIndicatorInput
             ref={ref}
+            type='email'
             inputRef={inputRef}
             isPending={isPending}
             error={Boolean(error)}
