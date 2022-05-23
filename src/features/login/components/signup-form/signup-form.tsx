@@ -26,13 +26,16 @@ export function SignupForm() {
     },
   })
   const [createUser, { error, reset }] = useSignupFormRegisterMutation()
-
   const {
     handleSubmit,
     formState: { isSubmitting },
     reset: resetForm,
     setFocus,
   } = methods
+
+  React.useEffect(() => {
+    setFocus('email')
+  }, [setFocus])
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     const { email, username, password } = data
@@ -49,10 +52,6 @@ export function SignupForm() {
       console.error(error)
     }
   }
-
-  React.useEffect(() => {
-    setFocus('email')
-  }, [setFocus])
 
   return (
     <FormProvider {...methods}>
