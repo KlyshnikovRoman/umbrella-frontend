@@ -9,6 +9,7 @@ const nextConfig = {
   },
   publicRuntimeConfig: {
     graphqlEndpoint: process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT,
+    recaptchaKey: process.env.NEXT_PUBLIC_RECAPTCHA_KEY,
   },
   experimental: {
     modularizeImports: {

@@ -1,5 +1,5 @@
 import getConfig from 'next/config'
 
 export const {
-  publicRuntimeConfig: { graphqlEndpoint },
+  publicRuntimeConfig: { graphqlEndpoint, recaptchaKey },
 } = getConfig()
