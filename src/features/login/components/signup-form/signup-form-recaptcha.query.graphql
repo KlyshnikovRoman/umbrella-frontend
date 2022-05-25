@@ -1,0 +1,7 @@
+query SignupFormRecaptcha($token: String!) {
+  recaptcha(token: $token) {
+    success
+    score
+    errorCodes
+  }
+}

@@ -98,7 +98,6 @@ export type FloatFilterInput = {
 
 export type GenericMorph =
   | I18NLocale
-  | Test
   | UploadFile
   | UsersPermissionsPermission
   | UsersPermissionsRole
@@ -211,13 +210,11 @@ export type JsonFilterInput = {
 
 export type Mutation = {
   __typename?: 'Mutation'
-  createTest?: Maybe<TestEntityResponse>
   createUploadFile?: Maybe<UploadFileEntityResponse>
   /** Create a new role */
   createUsersPermissionsRole?: Maybe<UsersPermissionsCreateRolePayload>
   /** Create a new user */
   createUsersPermissionsUser: UsersPermissionsUserEntityResponse
-  deleteTest?: Maybe<TestEntityResponse>
   deleteUploadFile?: Maybe<UploadFileEntityResponse>
   /** Delete an existing role */
   deleteUsersPermissionsRole?: Maybe<UsersPermissionsDeleteRolePayload>
@@ -235,17 +232,12 @@ export type Mutation = {
   /** Reset user password. Confirm with a code (resetToken from forgotPassword) */
   resetPassword?: Maybe<UsersPermissionsLoginPayload>
   updateFileInfo: UploadFileEntityResponse
-  updateTest?: Maybe<TestEntityResponse>
   updateUploadFile?: Maybe<UploadFileEntityResponse>
   /** Update an existing role */
   updateUsersPermissionsRole?: Maybe<UsersPermissionsUpdateRolePayload>
   /** Update an existing user */
   updateUsersPermissionsUser: UsersPermissionsUserEntityResponse
   upload: UploadFileEntityResponse
-}
-
-export type MutationCreateTestArgs = {
-  data: TestInput
 }
 
 export type MutationCreateUploadFileArgs = {
@@ -258,10 +250,6 @@ export type MutationCreateUsersPermissionsRoleArgs = {
 
 export type MutationCreateUsersPermissionsUserArgs = {
   data: UsersPermissionsUserInput
-}
-
-export type MutationDeleteTestArgs = {
-  id: Scalars['ID']
 }
 
 export type MutationDeleteUploadFileArgs = {
@@ -314,11 +302,6 @@ export type MutationUpdateFileInfoArgs = {
   info?: InputMaybe<FileInfoInput>
 }
 
-export type MutationUpdateTestArgs = {
-  data: TestInput
-  id: Scalars['ID']
-}
-
 export type MutationUpdateUploadFileArgs = {
   data: UploadFileInput
   id: Scalars['ID']
@@ -364,8 +347,7 @@ export type Query = {
   isEmailAvailable: Scalars['Boolean']
   isUsernameAvailable: Scalars['Boolean']
   me?: Maybe<UsersPermissionsMe>
-  test?: Maybe<TestEntityResponse>
-  tests?: Maybe<TestEntityResponseCollection>
+  recaptcha: RecaptchaEntityResponse
   uploadFile?: Maybe<UploadFileEntityResponse>
   uploadFiles?: Maybe<UploadFileEntityResponseCollection>
   usersPermissionsRole?: Maybe<UsersPermissionsRoleEntityResponse>
@@ -392,14 +374,8 @@ export type QueryIsUsernameAvailableArgs = {
   username: Scalars['String']
 }
 
-export type QueryTestArgs = {
-  id?: InputMaybe<Scalars['ID']>
-}
-
-export type QueryTestsArgs = {
-  filters?: InputMaybe<TestFiltersInput>
-  pagination?: InputMaybe<PaginationArg>
-  sort?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
+export type QueryRecaptchaArgs = {
+  token: Scalars['String']
 }
 
 export type QueryUploadFileArgs = {
@@ -432,6 +408,13 @@ export type QueryUsersPermissionsUsersArgs = {
   sort?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
 }
 
+export type RecaptchaEntityResponse = {
+  __typename?: 'RecaptchaEntityResponse'
+  errorCodes?: Maybe<Array<Scalars['String']>>
+  score: Scalars['Float']
+  success: Scalars['Boolean']
+}
+
 export type ResponseCollectionMeta = {
   __typename?: 'ResponseCollectionMeta'
   pagination: Pagination
@@ -458,44 +441,6 @@ export type StringFilterInput = {
   null?: InputMaybe<Scalars['Boolean']>
   or?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
   startsWith?: InputMaybe<Scalars['String']>
-}
-
-export type Test = {
-  __typename?: 'Test'
-  createdAt?: Maybe<Scalars['DateTime']>
-  title?: Maybe<Scalars['String']>
-  updatedAt?: Maybe<Scalars['DateTime']>
-}
-
-export type TestEntity = {
-  __typename?: 'TestEntity'
-  attributes?: Maybe<Test>
-  id?: Maybe<Scalars['ID']>
-}
-
-export type TestEntityResponse = {
-  __typename?: 'TestEntityResponse'
-  data?: Maybe<TestEntity>
-}
-
-export type TestEntityResponseCollection = {
-  __typename?: 'TestEntityResponseCollection'
-  data: Array<TestEntity>
-  meta: ResponseCollectionMeta
-}
-
-export type TestFiltersInput = {
-  and?: InputMaybe<Array<InputMaybe<TestFiltersInput>>>
-  createdAt?: InputMaybe<DateTimeFilterInput>
-  id?: InputMaybe<IdFilterInput>
-  not?: InputMaybe<TestFiltersInput>
-  or?: InputMaybe<Array<InputMaybe<TestFiltersInput>>>
-  title?: InputMaybe<StringFilterInput>
-  updatedAt?: InputMaybe<DateTimeFilterInput>
-}
-
-export type TestInput = {
-  title?: InputMaybe<Scalars['String']>
 }
 
 export type UploadFile = {
@@ -788,6 +733,20 @@ export type UsersPermissionsUserRelationResponseCollection = {
   data: Array<UsersPermissionsUserEntity>
 }
 
+export type SignupFormRecaptchaQueryVariables = Exact<{
+  token: Scalars['String']
+}>
+
+export type SignupFormRecaptchaQuery = {
+  __typename?: 'Query'
+  recaptcha: {
+    __typename?: 'RecaptchaEntityResponse'
+    success: boolean
+    score: number
+    errorCodes?: Array<string> | null
+  }
+}
+
 export type SignupFormRegisterMutationVariables = Exact<{
   input: UsersPermissionsRegisterInput
 }>
@@ -812,6 +771,61 @@ export type IsUsernameAvailableQueryVariables = Exact<{
 
 export type IsUsernameAvailableQuery = { __typename?: 'Query'; isUsernameAvailable: boolean }
 
+export const SignupFormRecaptchaDocument = gql`
+  query SignupFormRecaptcha($token: String!) {
+    recaptcha(token: $token) {
+      success
+      score
+      errorCodes
+    }
+  }
+`
+
+/**
+ * __useSignupFormRecaptchaQuery__
+ *
+ * To run a query within a React component, call `useSignupFormRecaptchaQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSignupFormRecaptchaQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSignupFormRecaptchaQuery({
+ *   variables: {
+ *      token: // value for 'token'
+ *   },
+ * });
+ */
+export function useSignupFormRecaptchaQuery(
+  baseOptions: Apollo.QueryHookOptions<SignupFormRecaptchaQuery, SignupFormRecaptchaQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<SignupFormRecaptchaQuery, SignupFormRecaptchaQueryVariables>(
+    SignupFormRecaptchaDocument,
+    options
+  )
+}
+export function useSignupFormRecaptchaLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    SignupFormRecaptchaQuery,
+    SignupFormRecaptchaQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<SignupFormRecaptchaQuery, SignupFormRecaptchaQueryVariables>(
+    SignupFormRecaptchaDocument,
+    options
+  )
+}
+export type SignupFormRecaptchaQueryHookResult = ReturnType<typeof useSignupFormRecaptchaQuery>
+export type SignupFormRecaptchaLazyQueryHookResult = ReturnType<
+  typeof useSignupFormRecaptchaLazyQuery
+>
+export type SignupFormRecaptchaQueryResult = Apollo.QueryResult<
+  SignupFormRecaptchaQuery,
+  SignupFormRecaptchaQueryVariables
+>
 export const SignupFormRegisterDocument = gql`
   mutation SignupFormRegister($input: UsersPermissionsRegisterInput!) {
     register(input: $input) {
