@@ -1,14 +1,11 @@
 import React from 'react'
 import { Box } from '@mui/material'
-import NextLink from 'next/link'
-import { LogoIcon } from 'src/components/icons'
 
 export interface LoginWrapperProps {
-  title: React.ReactNode
   children: React.ReactNode
 }
 
-export function LoginWrapper({ title, children }: LoginWrapperProps) {
+export function LoginWrapper({ children }: LoginWrapperProps) {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Box
@@ -32,22 +29,6 @@ export function LoginWrapper({ title, children }: LoginWrapperProps) {
             borderRadius: { sm: 2 },
           }}
         >
-          <Box sx={{ mb: 2, textAlign: 'center' }}>
-            <Box sx={{ mb: 1 }}>
-              <NextLink href='/' passHref>
-                <Box component='a' sx={{ display: 'inline-block' }}>
-                  <LogoIcon width={38} height={38} />
-                </Box>
-              </NextLink>
-            </Box>
-            <Box sx={{ fontSize: 22 }}>Umbrella</Box>
-          </Box>
-          <Box
-            component='h1'
-            sx={{ fontSize: 26, fontWeight: 'regular', textAlign: 'center', mt: 0, mb: 3 }}
-          >
-            {title}
-          </Box>
           {children}
         </Box>
       </Box>

@@ -1,7 +1,9 @@
 import React from 'react'
+import NextHead from 'next/head'
 import type { AppProps as NexAppProps } from 'next/app'
 import { ApolloProvider } from '@apollo/client'
 import { CacheProvider, EmotionCache } from '@emotion/react'
+import { DefaultSeo } from 'next-seo'
 import { ThemeProvider } from 'src/theme'
 import { useApollo } from 'src/graphql/apollo'
 import { createEmotionCache } from 'src/utils/create-emotion-cache'
@@ -21,6 +23,10 @@ export default function App({
 
   return (
     <ApolloProvider client={apolloClient}>
+      <NextHead>
+        <meta content='minimum-scale=1, initial-scale=1, width=device-width' name='viewport' />
+      </NextHead>
+      <DefaultSeo defaultTitle='Umbrella' titleTemplate='%s · Umbrella' />
       <CacheProvider value={emotionCache}>
         <ThemeProvider>
           <Component {...pageProps} />

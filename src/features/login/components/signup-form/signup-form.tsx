@@ -43,42 +43,43 @@ export function SignupForm() {
     setFocus('email')
   }, [setFocus])
 
-  const onSubmit: SubmitHandler<FormValues> = async ({ email, username, password }) => {
-    try {
-      const token = await execute({ action: 'submit' })
-      const {
-        data: { recaptcha },
-      } = await getRecaptchaResponse({ variables: { token } })
+  const onSubmit: SubmitHandler<FormValues> = React.useCallback(
+    async ({ email, username, password }) => {
+      try {
+        const token = await execute({ action: 'submit' })
+        const {
+          data: { recaptcha },
+        } = await getRecaptchaResponse({ variables: { token } })
 
-      if (!recaptcha.success && recaptcha.score < 0.5) {
-        setError('service', {
-          type: 'recaptcha',
-          message: 'Вы не прошли проверку Google reCAPTCHA v3.',
+        if (!recaptcha.success && recaptcha.score < 0.5) {
+          setError('service', {
+            type: 'recaptcha',
+            message: 'Вы не прошли проверку Google reCAPTCHA v3.',
+          })
+
+          return
+        }
+
+        await createUser({
+          variables: {
+            input: { email, username, password },
+          },
         })
 
-        return
+        reset()
+      } catch {
+        setError('service', {
+          type: 'unknown',
+          message: 'Что-то пошло не так. Повторите попытку позже.',
+        })
       }
+    },
+    [reset, setError, createUser, execute, getRecaptchaResponse]
+  )
 
-      await createUser({
-        variables: {
-          input: { email, username, password },
-        },
-      })
-
-      reset()
-    } catch (error) {
-      setError('service', {
-        type: 'unknown',
-        message: 'Что-то пошло не так. Повторите попытку позже.',
-      })
-
-      console.error(error)
-    }
-  }
-
-  const onClickAlertCloseButton = () => {
+  const onClickAlertCloseButton = React.useCallback(() => {
     clearErrors('service')
-  }
+  }, [clearErrors])
 
   return (
     <FormProvider {...methods}>
