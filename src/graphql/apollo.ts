@@ -8,6 +8,8 @@ import typeDefs from './type-defs.graphql'
 const isServer = typeof window === 'undefined'
 let apolloClient: ApolloClient<NormalizedCacheObject>
 
+export const cache = new InMemoryCache()
+
 function createApolloClient() {
   return new ApolloClient({
     ssrMode: isServer,
