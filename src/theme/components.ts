@@ -92,6 +92,9 @@ export function components(theme: Theme): Theme['components'] {
       },
     },
     MuiOutlinedInput: {
+      defaultProps: {
+        size: 'small',
+      },
       styleOverrides: {
         root: {
           backgroundColor: theme.palette.grey[600],
