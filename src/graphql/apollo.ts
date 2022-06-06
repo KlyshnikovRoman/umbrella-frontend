@@ -17,7 +17,7 @@ function createApolloClient() {
       uri: graphqlEndpoint,
       credentials: 'same-origin',
     }),
-    cache: new InMemoryCache(),
+    cache,
     typeDefs,
   })
 }
