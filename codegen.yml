@@ -1,5 +1,7 @@
 overwrite: true
-schema: ${NEXT_PUBLIC_GRAPHQL_ENDPOINT}
+schema:
+  - ${NEXT_PUBLIC_GRAPHQL_ENDPOINT}
+  - src/graphql/type-defs.graphql
 documents: src/**/*.graphql
 generates:
   src/graphql/schema.ts:
