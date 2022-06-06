@@ -1,4 +1,5 @@
 import React from 'react'
+import { useRouter } from 'next/router'
 import { Stack, Alert, IconButton } from '@mui/material'
 import { Close as CloseIcon } from '@mui/icons-material'
 import { LoadingButton } from '@mui/lab'
@@ -27,7 +28,13 @@ export function SignupForm() {
       repassword: '',
     },
   })
-  const [createUser] = useSignupFormRegisterMutation()
+  const router = useRouter()
+  const [createUser] = useSignupFormRegisterMutation({
+    onCompleted: ({ register }) => {
+      window.sessionStorage.setItem('signupEmail', register.user.email)
+      router.push('/login/verify')
+    },
+  })
   const [getRecaptchaResponse] = useSignupFormRecaptchaLazyQuery()
   const {
     handleSubmit,

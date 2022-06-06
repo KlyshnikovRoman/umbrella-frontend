@@ -1,0 +1,6 @@
+mutation Verify($email: String!, $code: String!) {
+  accountVerify(email: $email, code: $code) {
+    success
+    errorMessage
+  }
+}

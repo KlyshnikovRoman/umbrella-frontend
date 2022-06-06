@@ -21,6 +21,12 @@ export type Scalars = {
   Upload: any
 }
 
+export type AccountVerify = {
+  __typename?: 'AccountVerify'
+  errorMessage?: Maybe<Scalars['String']>
+  success: Scalars['Boolean']
+}
+
 export type BooleanFilterInput = {
   and?: InputMaybe<Array<InputMaybe<Scalars['Boolean']>>>
   between?: InputMaybe<Array<InputMaybe<Scalars['Boolean']>>>
@@ -210,6 +216,7 @@ export type JsonFilterInput = {
 
 export type Mutation = {
   __typename?: 'Mutation'
+  accountVerify: AccountVerify
   createUploadFile?: Maybe<UploadFileEntityResponse>
   /** Create a new role */
   createUsersPermissionsRole?: Maybe<UsersPermissionsCreateRolePayload>
@@ -238,6 +245,11 @@ export type Mutation = {
   /** Update an existing user */
   updateUsersPermissionsUser: UsersPermissionsUserEntityResponse
   upload: UploadFileEntityResponse
+}
+
+export type MutationAccountVerifyArgs = {
+  code: Scalars['String']
+  email: Scalars['String']
 }
 
 export type MutationCreateUploadFileArgs = {
@@ -739,12 +751,7 @@ export type SignupFormRecaptchaQueryVariables = Exact<{
 
 export type SignupFormRecaptchaQuery = {
   __typename?: 'Query'
-  recaptcha: {
-    __typename?: 'RecaptchaEntityResponse'
-    success: boolean
-    score: number
-    errorCodes?: Array<string> | null
-  }
+  recaptcha: { __typename?: 'RecaptchaEntityResponse'; success: boolean; score: number }
 }
 
 export type SignupFormRegisterMutationVariables = Exact<{
@@ -755,8 +762,18 @@ export type SignupFormRegisterMutation = {
   __typename?: 'Mutation'
   register: {
     __typename?: 'UsersPermissionsLoginPayload'
-    user: { __typename?: 'UsersPermissionsMe'; id: string; username: string }
+    user: { __typename?: 'UsersPermissionsMe'; email?: string | null }
   }
+}
+
+export type VerifyMutationVariables = Exact<{
+  email: Scalars['String']
+  code: Scalars['String']
+}>
+
+export type VerifyMutation = {
+  __typename?: 'Mutation'
+  accountVerify: { __typename?: 'AccountVerify'; success: boolean; errorMessage?: string | null }
 }
 
 export type IsEmailAvailableQueryVariables = Exact<{
@@ -776,7 +793,6 @@ export const SignupFormRecaptchaDocument = gql`
     recaptcha(token: $token) {
       success
       score
-      errorCodes
     }
   }
 `
@@ -830,8 +846,7 @@ export const SignupFormRegisterDocument = gql`
   mutation SignupFormRegister($input: UsersPermissionsRegisterInput!) {
     register(input: $input) {
       user {
-        id
-        username
+        email
       }
     }
   }
@@ -875,6 +890,46 @@ export type SignupFormRegisterMutationResult = Apollo.MutationResult<SignupFormR
 export type SignupFormRegisterMutationOptions = Apollo.BaseMutationOptions<
   SignupFormRegisterMutation,
   SignupFormRegisterMutationVariables
+>
+export const VerifyDocument = gql`
+  mutation Verify($email: String!, $code: String!) {
+    accountVerify(email: $email, code: $code) {
+      success
+      errorMessage
+    }
+  }
+`
+export type VerifyMutationFn = Apollo.MutationFunction<VerifyMutation, VerifyMutationVariables>
+
+/**
+ * __useVerifyMutation__
+ *
+ * To run a mutation, you first call `useVerifyMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useVerifyMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [verifyMutation, { data, loading, error }] = useVerifyMutation({
+ *   variables: {
+ *      email: // value for 'email'
+ *      code: // value for 'code'
+ *   },
+ * });
+ */
+export function useVerifyMutation(
+  baseOptions?: Apollo.MutationHookOptions<VerifyMutation, VerifyMutationVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useMutation<VerifyMutation, VerifyMutationVariables>(VerifyDocument, options)
+}
+export type VerifyMutationHookResult = ReturnType<typeof useVerifyMutation>
+export type VerifyMutationResult = Apollo.MutationResult<VerifyMutation>
+export type VerifyMutationOptions = Apollo.BaseMutationOptions<
+  VerifyMutation,
+  VerifyMutationVariables
 >
 export const IsEmailAvailableDocument = gql`
   query IsEmailAvailable($email: String!) {
